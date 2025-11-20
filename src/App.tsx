@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
-import Home from './components/home'
+import LandingPage from './components/landing'
 import Questions from './components/questions'
 import Results from './components/results'
 import LoadingScreen from './components/loading'
 
 import './App.css'
+import Topics from './components/topics'
 
 const App = () => {
   const [loading, setLoading] = useState(true)
@@ -20,7 +21,8 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/topics" element={<Topics />} />
         <Route path="/questions/:topic" element={<Questions />} />
         <Route path="/results" element={<Results />} />
       </Routes>

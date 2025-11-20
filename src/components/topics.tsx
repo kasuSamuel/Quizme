@@ -69,7 +69,7 @@ const TabList = styled.div`
   margin-top: 2rem;
 `
 
-const Home = () => {
+const Topics = () => {
   const { data: category = [], isLoading } = useGetCategoriesQuery('')
   const navigate = useNavigate()
 
@@ -105,4 +105,4 @@ title={tab.title.toUpperCase()}
   )
 }
 
-export default Home
+export default Topics

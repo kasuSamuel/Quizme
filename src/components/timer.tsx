@@ -1,37 +1,48 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
+import toast from 'react-hot-toast'
 
-type TimerProps = {
-  duration?: number
-  onTimeUp: () => void
-}
-
-const TimerWrapper = styled.div`
+const Wrapper = styled.div`
   position: relative;
-  width: 120px;
-  height: 120px;
+  display: grid;
+  place-items: center;
+  width: 100px;
+  height: 100px;
 `
 
-const Circle = styled.svg`
+const Dial = styled.svg`
+  width: 100px;
+  height: 100px;
   transform: rotate(-90deg);
 `
 
-const Number = styled.div`
+const TimeDisplay = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #2d3748;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #00ffff;
 `
 
-const Timer: React.FC<TimerProps> = ({ duration = 10, onTimeUp }) => {
+interface TimerProps {
+  duration?: number
+  onExpire?: () => void
+}
+
+const Timer = ({ duration = 10, onExpire }: TimerProps) => {
   const [timeLeft, setTimeLeft] = useState(duration)
+  const toastShownRef = useRef(false)
+
+  const radius = 54
+  const circumference = 2 * Math.PI * radius
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      onTimeUp() //
+    setTimeLeft(duration)
+    toastShownRef.current = false
+  }, [duration])
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      onExpire?.()
       return
     }
 
@@ -40,28 +51,47 @@ const Timer: React.FC<TimerProps> = ({ duration = 10, onTimeUp }) => {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [timeLeft, onTimeUp])
+  }, [timeLeft, onExpire])
 
-  const progress = (timeLeft / duration) * 283
+  // Separate effect for the toast notification
+  useEffect(() => {
+    if (timeLeft === 5 && !toastShownRef.current) {
+      toast('Moving to the next question soon!', {
+        icon: '🚨',
+        duration: 2000,
+      })
+      toastShownRef.current = true
+    }
+  }, [timeLeft])
+
+  const dashOffset = circumference * (1 - timeLeft / duration)
+
+  // Format mm:ss
+  const mm = String(Math.floor(timeLeft / 60)).padStart(2, '0')
+  const ss = String(timeLeft % 60).padStart(2, '0')
 
   return (
-    <TimerWrapper>
-      <Circle width="120" height="120">
-        <circle cx="60" cy="60" r="45" stroke="#E2E8F0" strokeWidth="10" fill="none" />
+    <Wrapper>
+      <Dial viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r={radius} fill="none" stroke="white" strokeWidth={8} />
         <circle
           cx="60"
           cy="60"
-          r="45"
-          stroke="#805AD5"
-          strokeWidth="10"
+          r={radius}
           fill="none"
-          strokeDasharray="283"
-          strokeDashoffset={283 - progress}
-          style={{ transition: 'stroke-dashoffset 1s linear' }}
+          stroke="#00ffff"
+          strokeWidth={8}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={dashOffset}
+          style={{ transition: 'stroke-dashoffset 0.2s linear' }}
         />
-      </Circle>
-      <Number>{timeLeft}</Number>
-    </TimerWrapper>
+      </Dial>
+
+      <TimeDisplay>
+        {mm}:{ss}
+      </TimeDisplay>
+    </Wrapper>
   )
 }
 

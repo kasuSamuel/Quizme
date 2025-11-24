@@ -34,13 +34,13 @@ const Title = styled.h1`
   font-size: 5rem;
   font-weight: 900;
   margin: 0;
-  color: #1a202c;
-  text-shadow:
-    -2px -2px 0px #60a5fa,
-    2px 2px 0px #a78bfa;
-  font-family: 'Fredoka One';
+  color: #00ffff;
+  font-family: 'Fredoka One', sans-serif;
   display: inline-block;
   animation: ${bounce} 2s infinite;
+  letter-spacing: 2px;
+  z-index: 10;
+  position: relative;
 `
 
 const LeftSide = styled.div`
@@ -57,9 +57,12 @@ const RightSide = styled.div`
 
 const Subtitle = styled.p`
   font-size: 0.9rem;
-  color: #8b8b8bff;
+  color: #00ffff;
   animation: ${fadeIn} 1.2s ease-in-out;
   font-style: italic;
+  text-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00ffff;
 `
 
 const TabList = styled.div`

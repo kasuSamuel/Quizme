@@ -17,14 +17,81 @@ const fall = keyframes`
   }
 `
 
+const glow = keyframes`
+  0%, 100% {
+    text-shadow: 0 0 10px #00ffff;
+  }
+  50% {
+    text-shadow: 0 0 20px #00ffff;
+  }
+`
+
+const borderGlow = keyframes`
+  0%, 100% {
+    border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    border-color: #0099ff;
+    box-shadow: 0 0 20px rgba(0, 153, 255, 0.8), inset 0 0 15px rgba(0, 153, 255, 0.2);
+  }
+`
+
+const pulse = keyframes`
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+`
+
 const CardWrapper = styled.div`
   display: flex;
-  width: 100vw;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
   position: relative;
   overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+
+  /* Gaming cyberpunk background */
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d0d2b 100%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(
+        0deg,
+        transparent 24%,
+        rgba(0, 255, 255, 0.05) 25%,
+        rgba(0, 255, 255, 0.05) 26%,
+        transparent 27%,
+        transparent 74%,
+        rgba(0, 255, 255, 0.05) 75%,
+        rgba(0, 255, 255, 0.05) 76%,
+        transparent 77%,
+        transparent
+      ),
+      linear-gradient(
+        90deg,
+        transparent 24%,
+        rgba(0, 255, 255, 0.05) 25%,
+        rgba(0, 255, 255, 0.05) 26%,
+        transparent 27%,
+        transparent 74%,
+        rgba(0, 255, 255, 0.05) 75%,
+        rgba(0, 255, 255, 0.05) 76%,
+        transparent 77%,
+        transparent
+      );
+    background-size: 50px 50px;
+    pointer-events: none;
+  }
 `
 
 const Confetti = styled.div<ConfettiProps>`
@@ -34,61 +101,81 @@ const Confetti = styled.div<ConfettiProps>`
   animation-delay: ${(props) => props.$delay}s;
   left: ${(props) => props.$left}%;
   top: -50px;
+  filter: drop-shadow(0 0 10px #00ffff);
 `
 
-const Card = styled.div`
-  background: #ffffff;
+const Card = styled.div<{ $passed: boolean }>`
+  background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 26, 62, 0.95) 100%);
+  border: 2px solid ${(props) => (props.$passed ? '#00ff00' : '#ff0055')};
   border-radius: 20px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  animation: ${borderGlow} 3s ease-in-out infinite;
   padding: 3rem 4rem;
   text-align: center;
   max-width: 500px;
   width: 100%;
   position: relative;
   z-index: 10;
+  backdrop-filter: blur(10px);
+
+  /* Enhanced neon glow and shadow */
+  box-shadow:
+    0 0 20px ${(props) => (props.$passed ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 85, 0.6)')},
+    inset 0 0 20px ${(props) => (props.$passed ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 0, 85, 0.1)')},
+    0 0 40px ${(props) => (props.$passed ? 'rgba(0, 255, 255, 0.3)' : 'rgba(255, 0, 85, 0.2)')};
 `
 
 const Title = styled.h1`
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #1a202c;
+  color: #00ffff;
+  animation: ${glow} 3s ease-in-out infinite;
+  letter-spacing: 2px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
 `
 
 const Topic = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 2rem;
-  color: #4a5568;
+  color: #00ff00;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+  letter-spacing: 1px;
 `
 
 const ResultMessage = styled.div<{ $passed: boolean }>`
   font-size: 1.8rem;
   font-weight: bold;
   margin: 1rem 0;
-  color: ${(props) => (props.$passed ? '#10b981' : '#ef4444')};
+  color: ${(props) => (props.$passed ? '#00ff00' : '#ff0055')};
+  text-shadow: 0 0 15px
+    ${(props) => (props.$passed ? 'rgba(0, 255, 0, 0.8)' : 'rgba(255, 0, 85, 0.8)')};
+  animation: ${pulse} 2s ease-in-out infinite;
 `
 
 const Score = styled.h3<{ $passed: boolean }>`
   font-size: 4rem;
   font-weight: 900;
   margin: 2rem 0;
-  color: ${(props) => (props.$passed ? '#10b981' : '#ef4444')};
-  text-shadow:
-    -2px -2px 0px ${(props) => (props.$passed ? '#60a5fa' : '#fca5a5')},
-    2px 2px 0px ${(props) => (props.$passed ? '#a78bfa' : '#f87171')};
+  color: ${(props) => (props.$passed ? '#00ff00' : '#ff0055')};
   font-family: 'Fredoka One', cursive;
+  animation: ${pulse} 2.5s ease-in-out infinite;
 `
 
 const Percentage = styled.div`
   font-size: 1.2rem;
-  color: #6b7280;
+  color: #00ffff;
   margin-bottom: 1rem;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
 `
 
 const Message = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: #00ddff;
   margin: 1.5rem 0;
   line-height: 1.6;
+  text-shadow: 0 0 5px rgba(0, 221, 255, 0.5);
 `
 
 const ButtonContainer = styled.div`
@@ -97,6 +184,7 @@ const ButtonContainer = styled.div`
   gap: 1rem;
   margin-top: 2rem;
 `
+
 
 const Results = () => {
   const [showConfetti, setShowConfetti] = useState(false)
@@ -120,7 +208,41 @@ const Results = () => {
   // Generate confetti elements
   const confettiElements = showConfetti
     ? [...Array(30)].map((_, i) => {
-        const emojis = ['🌸', '🌺', '🌼', '🌻', '🌷', '🎉', '✨', '⭐', '💐']
+        const emojis = [
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+          '🎉',
+          '🎊',
+        ]
         return (
           <Confetti key={i} $delay={i * 0.1} $left={Math.random() * 100}>
             {emojis[Math.floor(Math.random() * emojis.length)]}
@@ -132,7 +254,7 @@ const Results = () => {
   return (
     <CardWrapper>
       {confettiElements}
-      <Card>
+      <Card $passed={true}>
         <Title>Quiz Results</Title>
         <Topic>Topic: {topic}</Topic>
 

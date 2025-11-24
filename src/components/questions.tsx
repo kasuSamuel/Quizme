@@ -1,11 +1,13 @@
 import styled from 'styled-components'
 import Tab from './tab'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import Button from './button'
 import ProgressBar from './progressBar'
 import { useGetQuestionsByCategoryQuery } from '../store/GameSlice'
 import LoadingScreen from './loading'
+import Timer from './timer'
+import EmptyState from './empty'
 
 const Background = styled.div`
   width: 60%;
@@ -34,14 +36,19 @@ const Question = styled.h3`
   font-size: 2rem;
   font-weight: 900;
   margin: 0;
-  color: #1a202c;
+  color: #00ffff;
   font-family: 'Fredoka One';
   text-align: left;
 `
 
 const QuestionNumber = styled.p`
   font-size: 0.9rem;
-  color: #8b8b8bff;
+  font-style: italic;
+  max-width: 600px;
+  color: #00ffff;
+  text-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00ffff;
   text-align: left;
 `
 
@@ -53,58 +60,89 @@ const TabList = styled.div`
 `
 
 const Questions = () => {
+  const navigate = useNavigate()
+  const { topic } = useParams<{ topic: string }>()
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
 
-  const navigate = useNavigate()
-  const { topic } = useParams<{ topic: string }>()
-
   const { data: questions = [], isLoading } = useGetQuestionsByCategoryQuery(topic!)
 
+  const correctIndex = useMemo(() => {
+    if (!questions || questions.length === 0 || index >= questions.length) {
+      return -1
+    }
+    const question = questions[index]
+    return question.options.findIndex((opt: string) => opt === question.answer)
+  }, [questions, index])
 
-if (isLoading) {
-  return <LoadingScreen />
-}
+  // Define ALL callbacks BEFORE any early returns
+  const handleSelect = useCallback((i: number) => {
+    setSelected((prev) => (!submitted ? i : prev))
+  }, [submitted])
 
-  if (!questions || questions.length === 0) return null
+  const handleTimeout = useCallback(() => {
+    setSubmitted(true)
+    setTimeout(() => {
+      setIndex((prevIndex) => {
+        const next = prevIndex + 1
+        if (next < questions.length) {
+          setSelected(null)
+          setSubmitted(false)
+          return next
+        } else {
+          navigate('/results', {
+            state: {
+              score,
+              total: questions.length,
+              topic,
+            },
+          })
+          return prevIndex
+        }
+      })
+    }, 800)
+  }, [questions.length, navigate, score, topic])
+
+  const handleExpire = useCallback(() => {
+    handleTimeout()
+  }, [handleTimeout])
+
+const handleButton = useCallback(() => {
+  if (!submitted) {
+    if (selected === null) return; // Don't allow submission if no option is selected
+
+    const currentQuestion = questions[index];
+    if (selected === correctIndex) {
+      setScore(prev => prev + 1); // Increment score if the answer is correct
+    }
+
+    setSubmitted(true); // Mark question as submitted
+    return;
+  }
+
+  // Next question or results
+  const next = index + 1;
+  if (next < questions.length) {
+    setIndex(next);
+    setSelected(null); // Reset selection for the next question
+    setSubmitted(false); // Reset submission state
+  } else {
+    navigate('/results', {
+      state: { score, total: questions.length, topic },
+    });
+  }
+}, [submitted, selected, index, questions.length, navigate, score, topic, correctIndex]);
+
+
+  // Memoize the correctIndex calculation
+
+
+  if (isLoading) return <LoadingScreen />
+  if (!questions || questions.length === 0) return <EmptyState />
 
   const question = questions[index]
-  const correctIndex = question.options.findIndex((opt: string) => opt === question.answer)
-
-  const handleSelect = (i: number) => {
-    if (!submitted) setSelected(i)
-  }
-
-  const handleButton = () => {
-    if (!submitted) {
-      if (selected === null) return
-
-      // Count the point immediately when submitting
-      if (selected === correctIndex) {
-        setScore((prev) => prev + 1)
-      }
-      setSubmitted(true)
-    } else {
-      // Move to next question or finish
-      const next = index + 1
-      if (next < questions.length) {
-        setIndex(next)
-        setSelected(null)
-        setSubmitted(false)
-      } else {
-
-        navigate('/results', {
-          state: {
-            score,
-            total: questions.length,
-            topic,
-          },
-        })
-      }
-    }
-  }
 
   return (
     <Background>
@@ -114,7 +152,10 @@ if (isLoading) {
         </QuestionNumber>
 
         <Question>{question.questionText}</Question>
+
         <ProgressBar current={index} total={questions.length} />
+
+        <Timer key={index} duration={45} onExpire={handleExpire} />
       </LeftSide>
 
       <RightSide>

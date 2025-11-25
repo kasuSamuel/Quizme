@@ -24,18 +24,6 @@ const zoomIn = keyframes`
   to { transform: scale(1); opacity: 1; filter: blur(0); }
 `
 
-const glowPulse = keyframes`
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5),
-                0 0 40px rgba(0, 255, 255, 0.3),
-                inset 0 0 20px rgba(0, 255, 255, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8),
-                0 0 60px rgba(0, 255, 255, 0.5),
-                inset 0 0 20px rgba(0, 255, 255, 0.2);
-  }
-`
 
 const slideDown = keyframes`
   from { transform: translateY(-10px); opacity: 0; }

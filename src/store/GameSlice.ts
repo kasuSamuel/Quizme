@@ -37,7 +37,7 @@ export const quizApi = createApi({
 
     getQuestionsByCategory: builder.query<Question[], string>({
       query: (category) => `/${category}`,
-      providesTags: (result, error, category) =>
+      providesTags: (result, ___, category) =>
         result ? [{ type: 'Questions', id: category }] : ['Questions'],
     }),
 
@@ -68,7 +68,7 @@ export const quizApi = createApi({
         method: 'POST',
         body: questionData,
       }),
-      invalidatesTags: (result, error, { category }) => [
+      invalidatesTags: (___, ____, { category }) => [
         { type: 'Questions', id: category },
         'Categories',
       ],

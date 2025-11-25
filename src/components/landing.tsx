@@ -92,14 +92,14 @@ const ButtonGroup = styled.div`
   }
 `
 
-const pulseGlow = keyframes`
-  0%, 100% {
-    box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #0099ff, inset 0 0 5px rgba(0, 255, 255, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff, 0 0 35px #0099ff, inset 0 0 10px rgba(0, 255, 255, 0.3);
-  }
-`
+// const pulseGlow = keyframes`
+//   0%, 100% {
+//     box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #0099ff, inset 0 0 5px rgba(0, 255, 255, 0.2);
+//   }
+//   50% {
+//     box-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff, 0 0 35px #0099ff, inset 0 0 10px rgba(0, 255, 255, 0.3);
+//   }
+// `
 
 const FloatingShape = styled.div`
   position: absolute;

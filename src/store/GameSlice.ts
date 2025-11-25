@@ -25,22 +25,26 @@ export const quizApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://quizme-backend-612i.onrender.com/api/Quiz',
   }),
+  tagTypes: ['Categories', 'Questions'],
   endpoints: (builder) => ({
     getCategories: builder.query<CategoryResponse[], string>({
       query: () => 'categories',
+      providesTags: ['Categories'],
     }),
 
     getQuestionsByCategory: builder.query<Question[], string>({
       query: (category) => `/${category}`,
+      providesTags: (result, error, category) =>
+        result ? [{ type: 'Questions', id: category }] : ['Questions'],
     }),
 
-    // PUT request to update category with id, title, and imgSrc
     updateCategory: builder.mutation<void, UpdateCategory>({
       query: ({ id, title, imgSrc }) => ({
         url: `/categories/${id}`,
         method: 'PUT',
         body: { title, imgSrc },
       }),
+      invalidatesTags: ['Categories'],
     }),
 
     createCategory: builder.mutation<CategoryResponse, { title: string; imgSrc: string }>({
@@ -49,6 +53,7 @@ export const quizApi = createApi({
         method: 'POST',
         body: { title, imgSrc },
       }),
+      invalidatesTags: ['Categories'],
     }),
 
     createQuestion: builder.mutation<
@@ -60,6 +65,10 @@ export const quizApi = createApi({
         method: 'POST',
         body: questionData,
       }),
+      invalidatesTags: (result, error, { category }) => [
+        { type: 'Questions', id: category },
+        'Categories',
+      ],
     }),
 
     deleteCategory: builder.mutation<void, { id: number }>({
@@ -67,21 +76,24 @@ export const quizApi = createApi({
         url: `/categories/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Categories'],
     }),
 
-    updateQuestion: builder.mutation<void, {  id: number; questionData: Omit<Question, 'id'> }>({
+    updateQuestion: builder.mutation<void, { id: number; questionData: Omit<Question, 'id'> }>({
       query: ({ id, questionData }) => ({
         url: `/questions/${id}`,
         method: 'PUT',
         body: questionData,
       }),
+      invalidatesTags: ['Questions'],
     }),
 
-    deleteQuestion: builder.mutation<void, {  id: number }>({
-      query: ({  id }) => ({
+    deleteQuestion: builder.mutation<void, { id: number }>({
+      query: ({ id }) => ({
         url: `/questions/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Questions'],
     }),
   }),
 })
@@ -95,5 +107,4 @@ export const {
   useDeleteCategoryMutation,
   useDeleteQuestionMutation,
   useUpdateQuestionMutation,
-
 } = quizApi

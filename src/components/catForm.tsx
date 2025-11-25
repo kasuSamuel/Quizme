@@ -8,9 +8,10 @@ import styled, { keyframes } from 'styled-components'
 interface CategoryFormProps {
   categoryName: string
   categoryImage: string
+  categoryTime: number
   isEditing: boolean
   onCancel: () => void
-  onSubmit: (title: string, imageSrc: string | File) => void
+  onSubmit: (title: string, imageSrc: string | File, time: number) => void
 }
 
 // Animations
@@ -193,6 +194,7 @@ const ImagePreview = styled.img`
 const CategoryForm: React.FC<CategoryFormProps> = ({
   categoryName,
   categoryImage,
+  categoryTime,
   isEditing,
   onCancel,
   onSubmit,
@@ -201,6 +203,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   const [imagePreview, setImagePreview] = useState(categoryImage)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [error, setError] = useState('')
+  const [time, setTime] = useState<number>(categoryTime)
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -218,7 +222,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
     setError('')
     // Send imageFile if selected, otherwise send the existing imagePreview string
-    onSubmit(name, imageFile || imagePreview)
+    onSubmit(name, imageFile || imagePreview, time)
   }
 
   return (
@@ -252,6 +256,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             }}
           />
           {isEditing && <HelperText>Leave empty to keep existing image</HelperText>}
+        </FormField>
+
+        <FormField>
+          <Label>Time Limit (in seconds)</Label>
+          <Input
+            placeholder="Enter a time for question in seconds..."
+            value={time}
+            onChange={(e) => setTime(parseInt(e.target.value, 10))}
+          />
         </FormField>
 
         {/* Preview */}

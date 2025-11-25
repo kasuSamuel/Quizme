@@ -139,6 +139,15 @@ const ActionButton = styled.button<{ $color: string }>`
   }
 `
 
+const Subtitle = styled.p`
+  font-size: 0.9rem;
+  color: #00ffff;
+  font-style: italic;
+  text-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00ffff;
+`
+
 interface QuestionsProps {
   selectedCategory?: string
 }
@@ -239,6 +248,9 @@ const QuestionList = ({ selectedCategory: propCategory }: QuestionsProps) => {
                   </li>
                 ))}
               </OptionsContainer>
+              <Subtitle>
+                <strong>Time Limit:</strong> {q.timeLimit} seconds
+              </Subtitle>
 
               <ActionButtons>
                 <ActionButton $color="#3b82f6" onClick={() => handleEditQuestion(q)}>

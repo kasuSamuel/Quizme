@@ -247,12 +247,14 @@ const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
   const [questionText, setQuestionText] = useState("")
   const [options, setOptions] = useState(["", "", "", ""])
   const [answer, setAnswer] = useState("")
+const [time, setTime] = useState<number>(0)
 
   useEffect(() => {
     if (isEditing && questionData) {
       setQuestionText(questionData.questionText)
       setOptions(questionData.options)
       setAnswer(questionData.answer)
+      setTime(questionData.timeLimit)
     }
   }, [isEditing, questionData])
 
@@ -274,6 +276,7 @@ const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
       questionText,
       options,
       answer,
+      timeLimit: Number(time),
     }
 
     try {
@@ -303,7 +306,7 @@ const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
   return (
     <Overlay>
       <Container>
-        <Title>{isEditing ? "Edit Question" : "Add New Question"}</Title>
+        <Title>{isEditing ? 'Edit Question' : 'Add New Question'}</Title>
 
         <FormField>
           <Label>Enter Question</Label>
@@ -330,7 +333,20 @@ const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
 
         <FormField>
           <Label>Correct Answer</Label>
-          <Input placeholder="Enter the correct answer..." value={answer} onChange={(e) => setAnswer(e.target.value)} />
+          <Input
+            placeholder="Enter the correct answer..."
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+          />
+        </FormField>
+
+        <FormField>
+          <Label>Time Limit (in seconds)</Label>
+          <Input
+            placeholder="Enter a time for this question in seconds..."
+            value={time}
+            onChange={(e) => setTime(parseInt(e.target.value, 10))}
+          />
         </FormField>
 
         <ButtonGroup>
@@ -338,8 +354,17 @@ const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
             Cancel
           </Button>
 
-          <Button color="green" variant="primary" onClick={handleSubmit} disabled={isLoading || updateLoading}>
-            {isLoading || updateLoading ? "Processing..." : isEditing ? "Update Question" : "Add Question"}
+          <Button
+            color="green"
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={isLoading || updateLoading}
+          >
+            {isLoading || updateLoading
+              ? 'Processing...'
+              : isEditing
+              ? 'Update Question'
+              : 'Add Question'}
           </Button>
         </ButtonGroup>
       </Container>

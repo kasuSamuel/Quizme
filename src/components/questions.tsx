@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCallback, useState, useMemo } from 'react'
 import Button from './button'
 import ProgressBar from './progressBar'
-import { useGetQuestionsByCategoryQuery } from '../store/GameSlice'
+import { useGetQuestionsByCategoryQuery, useGetCategoriesQuery } from '../store/GameSlice'
 import LoadingScreen from './loading'
 import Timer from './timer'
 import EmptyState from './empty'
@@ -46,9 +46,7 @@ const QuestionNumber = styled.p`
   font-style: italic;
   max-width: 600px;
   color: #00ffff;
-  text-shadow:
-    0 0 10px #00ffff,
-    0 0 20px #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
   text-align: left;
 `
 
@@ -67,82 +65,83 @@ const Questions = () => {
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
 
+  // Fetch all categories
+  const { data: categories = [] } = useGetCategoriesQuery('')
+
+  // Fetch questions for this category
   const { data: questions = [], isLoading } = useGetQuestionsByCategoryQuery(topic!)
+
+  // Find this category object
+  const category = useMemo(() => categories.find((c) => c.title === topic), [categories, topic])
 
   const correctIndex = useMemo(() => {
     if (!questions || questions.length === 0 || index >= questions.length) {
       return -1
     }
     const question = questions[index]
-    return question.options.findIndex((opt: string) => opt === question.answer)
+    return question.options.findIndex((opt) => opt === question.answer)
   }, [questions, index])
 
-  // Define ALL callbacks BEFORE any early returns
-  const handleSelect = useCallback((i: number) => {
-    setSelected((prev) => (!submitted ? i : prev))
-  }, [submitted])
+  // Final time limit logic
+  const question = questions[index]
+
+  const timeLimit = useMemo(() => {
+    if (!question) return 0
+
+    if (category?.defaultTimeLimit && category.defaultTimeLimit > 0) {
+      return category.defaultTimeLimit
+    }
+
+    return question.timeLimit
+  }, [question, category])
+
+  const handleSelect = useCallback(
+    (i: number) => {
+      setSelected((prev) => (!submitted ? i : prev))
+    },
+    [submitted],
+  )
+
+  const goToNextOrResults = useCallback(() => {
+    const next = index + 1
+    if (next < questions.length) {
+      setIndex(next)
+      setSelected(null)
+      setSubmitted(false)
+    } else {
+      navigate('/results', {
+        state: { score, total: questions.length, topic },
+      })
+    }
+  }, [index, questions.length, navigate, score, topic])
 
   const handleTimeout = useCallback(() => {
     setSubmitted(true)
-    setTimeout(() => {
-      setIndex((prevIndex) => {
-        const next = prevIndex + 1
-        if (next < questions.length) {
-          setSelected(null)
-          setSubmitted(false)
-          return next
-        } else {
-          navigate('/results', {
-            state: {
-              score,
-              total: questions.length,
-              topic,
-            },
-          })
-          return prevIndex
-        }
-      })
-    }, 800)
-  }, [questions.length, navigate, score, topic])
+    setTimeout(goToNextOrResults, 800)
+  }, [goToNextOrResults])
 
   const handleExpire = useCallback(() => {
     handleTimeout()
   }, [handleTimeout])
 
-const handleButton = useCallback(() => {
-  if (!submitted) {
-    if (selected === null) return; // Don't allow submission if no option is selected
+  const handleButton = useCallback(() => {
+    if (!submitted) {
+      if (selected === null) return
 
-    const currentQuestion = questions[index];
-    if (selected === correctIndex) {
-      setScore(prev => prev + 1); // Increment score if the answer is correct
+      if (selected === correctIndex) {
+        setScore((prev) => prev + 1)
+      }
+
+      setSubmitted(true)
+      return
     }
 
-    setSubmitted(true); // Mark question as submitted
-    return;
-  }
-
-  // Next question or results
-  const next = index + 1;
-  if (next < questions.length) {
-    setIndex(next);
-    setSelected(null); // Reset selection for the next question
-    setSubmitted(false); // Reset submission state
-  } else {
-    navigate('/results', {
-      state: { score, total: questions.length, topic },
-    });
-  }
-}, [submitted, selected, index, questions.length, navigate, score, topic, correctIndex]);
-
-
-  // Memoize the correctIndex calculation
-
+    // If already submitted, go next
+    goToNextOrResults()
+  }, [submitted, selected, correctIndex, goToNextOrResults])
 
   if (isLoading) return <LoadingScreen />
   if (!questions || questions.length === 0) return <EmptyState />
-
-  const question = questions[index]
 
   return (
     <Background>
@@ -155,12 +154,12 @@ const handleButton = useCallback(() => {
 
         <ProgressBar current={index} total={questions.length} />
 
-        <Timer key={index} duration={45} onExpire={handleExpire} />
+        <Timer key={index} duration={timeLimit} onExpire={handleExpire} />
       </LeftSide>
 
       <RightSide>
         <TabList>
-          {question.options.map((option: string, i: number) => (
+          {question.options.map((option, i) => (
             <Tab
               onClicked={() => handleSelect(i)}
               key={i}

@@ -5,6 +5,7 @@ export interface Question {
   questionText: string
   options: string[]
   answer: string
+  timeLimit: number
 }
 
 export interface CategoryResponse {
@@ -12,12 +13,14 @@ export interface CategoryResponse {
   title: string
   totalQuestions: number
   imgSrc: string
+  defaultTimeLimit: number
 }
 
 interface UpdateCategory {
   id: number
   title: string
   imgSrc: string
+  defaultTimeLimit: number
 }
 
 export const quizApi = createApi({
@@ -39,19 +42,19 @@ export const quizApi = createApi({
     }),
 
     updateCategory: builder.mutation<void, UpdateCategory>({
-      query: ({ id, title, imgSrc }) => ({
+      query: ({ id, title, imgSrc, defaultTimeLimit }) => ({
         url: `/categories/${id}`,
         method: 'PUT',
-        body: { title, imgSrc },
+        body: { title, imgSrc, defaultTimeLimit },
       }),
       invalidatesTags: ['Categories'],
     }),
 
-    createCategory: builder.mutation<CategoryResponse, { title: string; imgSrc: string }>({
-      query: ({ title, imgSrc }) => ({
+    createCategory: builder.mutation<CategoryResponse, { title: string; imgSrc: string, defaultTimeLimit: number }>({
+      query: ({ title, imgSrc , defaultTimeLimit}) => ({
         url: '/categories',
         method: 'POST',
-        body: { title, imgSrc },
+        body: { title, imgSrc, defaultTimeLimit },
       }),
       invalidatesTags: ['Categories'],
     }),

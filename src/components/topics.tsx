@@ -79,9 +79,9 @@ const Topics = () => {
   if (isLoading) return <LoadingScreen />
 
 
-  const handleTabClick = (title: string) => {
-    navigate(`/questions/${title}`)
-  }
+const handleTabClick = (title: string) => {
+  navigate(`/note/${title}`)
+}
 
   return (
     <Background>

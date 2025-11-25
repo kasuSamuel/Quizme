@@ -152,6 +152,7 @@ const Categories = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false)
   const [categoryName, setCategoryName] = useState('')
+  const [categoryTime, setCategoryTime] = useState(0)
   const [categoryImage, setCategoryImage] = useState('')
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null)
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null)
@@ -186,6 +187,7 @@ const Categories = () => {
     setEditingCategoryId(null)
     setCategoryName('')
     setCategoryImage('')
+    setCategoryTime(0)
     setIsAddEditOpen(true)
   }
 
@@ -194,6 +196,7 @@ const Categories = () => {
     setEditingCategoryId(cat.id)
     setCategoryName(cat.title)
     setCategoryImage(cat.imgSrc)
+    setCategoryTime(cat.defaultTimeLimit)
     setIsAddEditOpen(true)
   }
 
@@ -211,10 +214,10 @@ const Categories = () => {
       const imgUrl = typeof imageSrc === 'string' ? imageSrc : await fileToBase64(imageSrc)
 
       if (isEditing && editingCategoryId !== null) {
-        await updateCategory({ id: editingCategoryId, title, imgSrc: imgUrl })
+        await updateCategory({ id: editingCategoryId, title, imgSrc: imgUrl, defaultTimeLimit: categoryTime })
         toast.success('Category updated successfully!')
       } else {
-        await createCategory({ title, imgSrc: imgUrl })
+        await createCategory({ title, imgSrc: imgUrl, defaultTimeLimit: categoryTime })
         toast.success('Category added successfully!')
       }
       setIsAddEditOpen(false)
@@ -262,7 +265,6 @@ const Categories = () => {
               <ActionButton
                 $color="#10b981"
                 onClick={() => {
-
                   navigate('/admin/questions', {
                     state: { category: cat.title.toLowerCase() },
                   })
@@ -303,6 +305,7 @@ const Categories = () => {
           <CategoryForm
             categoryName={categoryName}
             categoryImage={categoryImage}
+            categoryTime={categoryTime}
             isEditing={isEditing}
             onCancel={() => setIsAddEditOpen(false)}
             onSubmit={handleSubmit}

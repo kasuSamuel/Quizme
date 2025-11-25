@@ -13,6 +13,7 @@ import Topics from './components/topics'
 import Dashboard from './components/Dashboard'
 import Categories from './components/adminPages/Categories'
 import QuestionList from './components/adminPages/Questions'
+import Note from './components/note'
 
 const App = () => {
   const [loading, setLoading] = useState(true)
@@ -28,6 +29,8 @@ const App = () => {
       <Toaster />
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/note/:topic" element={<Note />} />
+
         <Route path="/admin" element={<Admin />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="categories" element={<Categories />} />

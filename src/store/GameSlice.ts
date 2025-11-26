@@ -88,7 +88,7 @@ export const quizApi = createApi({
         method: 'PUT',
         body: questionData,
       }),
-      invalidatesTags: ['Questions'],
+      invalidatesTags: ['Questions', 'Categories'],
     }),
 
     deleteQuestion: builder.mutation<void, { id: number }>({

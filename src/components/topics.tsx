@@ -1,6 +1,6 @@
 import styled, { keyframes } from 'styled-components'
 import Tab from './tab'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import LoadingScreen from './loading'
 import { useGetCategoriesQuery } from '../store/GameSlice'
 

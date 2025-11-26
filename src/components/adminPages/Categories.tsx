@@ -209,7 +209,7 @@ const Categories = () => {
     })
   }
 
-  const handleSubmit = async (title: string, imageSrc: string | File) => {
+  const handleSubmit = async (title: string, imageSrc: string | File, categoryTime: number) => {
     try {
       const imgUrl = typeof imageSrc === 'string' ? imageSrc : await fileToBase64(imageSrc)
 

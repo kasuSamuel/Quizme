@@ -85,15 +85,22 @@ const Questions = () => {
   // Final time limit logic
   const question = questions[index]
 
-  const timeLimit = useMemo(() => {
-    if (!question) return 0
+const timeLimit = useMemo(() => {
+  if (!question) return 0
 
-    if (category?.defaultTimeLimit && category.defaultTimeLimit > 0) {
-      return category.defaultTimeLimit
-    }
-
+  // Use question's timeLimit if it's greater than 0
+  if (question.timeLimit && question.timeLimit > 0) {
     return question.timeLimit
-  }, [question, category])
+  }
+
+  // Otherwise, use category default if available
+  if (category?.defaultTimeLimit && category.defaultTimeLimit > 0) {
+    return category.defaultTimeLimit
+  }
+
+  return 0
+}, [question, category])
+
 
   const handleSelect = useCallback(
     (i: number) => {

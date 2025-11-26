@@ -248,19 +248,6 @@ const [time, setTime] = useState<number>()
 
   if (!isOpen) return null
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value === "") {
-      setTime(0);
-    } else {
-      const parsedValue = Number(value);
-
-      if (!isNaN(parsedValue)) {
-        setTime(parsedValue);
-      }
-    }
-  };
 
   const handleOptionChange = (index: number, value: string) => {
     const updated = [...options]
@@ -346,9 +333,13 @@ const [time, setTime] = useState<number>()
           <Label>Time Limit (in seconds)</Label>
           <Input
             placeholder="Enter a time for this question in seconds..."
-            type="number"
-            value={time === 0 ? '' : time}
-            onChange={handleChange}
+            value={time}
+            onChange={(e) => {
+              const value = Number(e.target.value)
+              if (!isNaN(value)) {
+                setTime(value)
+              }
+            }}
           />
         </FormField>
 

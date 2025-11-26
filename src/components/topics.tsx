@@ -1,6 +1,6 @@
 import styled, { keyframes } from 'styled-components'
 import Tab from './tab'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import LoadingScreen from './loading'
 import { useGetCategoriesQuery } from '../store/GameSlice'
 
@@ -41,6 +41,7 @@ const Title = styled.h1`
   letter-spacing: 2px;
   z-index: 10;
   position: relative;
+  cursor: pointer;
 `
 
 const LeftSide = styled.div`
@@ -86,7 +87,9 @@ const handleTabClick = (title: string) => {
   return (
     <Background>
       <LeftSide>
-        <Title>Quiz-me</Title>
+        <Title onClick={()=>
+          navigate('/')
+        }>Quiz-me</Title>
         <Subtitle>Discover your potential with Quiz-me!</Subtitle>
       </LeftSide>
 

@@ -235,7 +235,7 @@ const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
   const [questionText, setQuestionText] = useState("")
   const [options, setOptions] = useState(["", "", "", ""])
   const [answer, setAnswer] = useState("")
-const [time, setTime] = useState<number>(0)
+const [time, setTime] = useState<number>()
 
   useEffect(() => {
     if (isEditing && questionData) {
@@ -247,6 +247,20 @@ const [time, setTime] = useState<number>(0)
   }, [isEditing, questionData])
 
   if (!isOpen) return null
+
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === "") {
+      setTime(0);
+    } else {
+      const parsedValue = Number(value);
+
+      if (!isNaN(parsedValue)) {
+        setTime(parsedValue);
+      }
+    }
+  };
 
   const handleOptionChange = (index: number, value: string) => {
     const updated = [...options]
@@ -332,8 +346,9 @@ const [time, setTime] = useState<number>(0)
           <Label>Time Limit (in seconds)</Label>
           <Input
             placeholder="Enter a time for this question in seconds..."
-            value={time}
-            onChange={(e) => setTime(parseInt(e.target.value, 10))}
+            type="number"
+            value={time === 0 ? '' : time}
+            onChange={handleChange}
           />
         </FormField>
 
@@ -351,8 +366,8 @@ const [time, setTime] = useState<number>(0)
             {isLoading || updateLoading
               ? 'Processing...'
               : isEditing
-              ? 'Update Question'
-              : 'Add Question'}
+                ? 'Update Question'
+                : 'Add Question'}
           </Button>
         </ButtonGroup>
       </Container>
